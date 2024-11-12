@@ -10,21 +10,19 @@ from app.config import KINOPARK_API_TOKEN
 
 class MovieRecommender:
     def __init__(self):
-        self.imdb_data_path = r"C:\Users\Tao\PycharmProjects\recommendation_system_kinopark\data\imdb_movie_data.csv"
-        self.df = None  # IMDb DataFrame
-        self.kinopark_df = None  # Kinopark DataFrame
+        self.imdb_data_path = "data/imdb_movie_data.csv"
+        self.df = None
+        self.kinopark_df = None
         self.tfidf_vectorizer = None
-        self.tfidf_matrix = None  # TF-IDF матрица для IMDb
-        self.kinopark_tfidf = None  # TF-IDF матрица для Kinopark
+        self.tfidf_matrix = None
+        self.kinopark_tfidf = None
         self.genre_mapping = {
             'cartoon': 'animation',
-            # Добавьте другие соответствия по необходимости
         }
         self.load_imdb_data()
         self.prepare_tfidf()
 
     def load_imdb_data(self):
-        # Загрузка и обработка данных IMDb
         self.df = pd.read_csv(self.imdb_data_path)
         text_columns = ['genres', 'directors', 'writers', 'actors']
         for col in text_columns:
@@ -34,7 +32,6 @@ class MovieRecommender:
         self.df['content'] = self.df['genres'] + ' ' + self.df['directors'] + ' ' + self.df['writers'] + ' ' + self.df['actors']
 
     def get_kinopark_data(self, city_id):
-        # Получение данных из Kinopark API
         url = f"https://afisha.api.kinopark.kz/api/movie/today?city={city_id}&start=2024-11-12"
         headers = {
             "Authorization": f"Bearer {KINOPARK_API_TOKEN}",
