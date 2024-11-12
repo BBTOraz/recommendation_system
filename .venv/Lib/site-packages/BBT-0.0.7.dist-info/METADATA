@@ -1,0 +1,51 @@
+Metadata-Version: 2.1
+Name: BBT
+Version: 0.0.7
+Summary: BBT GAME AND SHELDON JOKES
+Home-page: 
+Author: Djsmanoj0000
+Author-email: djsmanoj0000@gmail.com
+License: MIT
+Keywords: Game
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Education
+Classifier: Operating System :: Microsoft :: Windows :: Windows 11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.7
+License-File: LICENCE.txt
+
+SIMPLE GAME AND JOKES FROM BBT.
+
+Change Log
+
+You can play Rock Paper Scissors Lizard Spock game with Shelodn using this module!
+
+Install package: pip install BBT == latest version number
+
+For fun!
+
+Import BBT
+
+print(BBT.get_codes())
+# will give all list of options you can play
+
+BBT.rpsls("Rock")
+
+# it will give what you have choosen and sheldon had choosen. Finally delares winner.
+
+
+==============
+
+0.0.1 (24/08/2022)
+
+0.0.2 Testing PIP upload
+
+0.0.3 Game Invented
+
+0.0.4 Game add features
+
+0.0.5 Module tested
+
+0.0.6 String Test case Fix
+
+0.0.7 Package Show in Pypi project FIX
