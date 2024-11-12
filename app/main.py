@@ -6,8 +6,6 @@ app = FastAPI(
     description="API для предоставления рекомендаций фильмов",
     version="1.0.0",
 )
-
-# Подключение маршрутов
 app.include_router(recommendations.router)
 
 @app.get("/")
