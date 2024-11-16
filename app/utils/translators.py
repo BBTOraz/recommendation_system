@@ -17,9 +17,9 @@ def translate_text(text, target_language='EN'):
         print(f"Ошибка при переводе текста: {e}")
         return text
 
-def translate_and_map_genres(genres_list, genre_mapping):
+def translate_and_map_genres(genres_tuple, genre_mapping):
     mapped_genres = []
-    for genre_entry in genres_list:
+    for genre_entry in genres_tuple:
         individual_genres = genre_entry.split(',')
         for genre in individual_genres:
             genre = genre.strip()
