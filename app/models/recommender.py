@@ -25,7 +25,7 @@ class MovieRecommender:
 
 
     def load_imdb_data(self):
-        # Загрузка данных IMDb
+        print("Загрузка данных IMDb")
         self.df = pd.read_csv(self.imdb_data_path)
         self.df['source'] = 'imdb'
         text_columns = ['genres', 'directors', 'writers', 'actors']
@@ -36,7 +36,7 @@ class MovieRecommender:
         self.df['content'] = self.df['genres'] + ' ' + self.df['directors'] + ' ' + self.df['writers'] + ' ' + self.df['actors']
 
     def get_kinopark_data(self, city_id):
-        # Получение текущей даты в формате YYYY-MM-DD
+        print("Получение текущей даты в формате YYYY-MM-DD")
         current_date = datetime.datetime.now().strftime("%Y-%m-%d")
         url = f"https://afisha.api.kinopark.kz/api/movie/today?city={city_id}&start={current_date}"
         headers = {
@@ -66,7 +66,7 @@ class MovieRecommender:
         return translate_and_map_genres(genres_tuple, self.genre_mapping)
 
     def process_kinopark_data(self):
-        # Перевод и обработка данных Kinopark
+        print("Перевод и обработка данных Kinopark")
         if not self.kinopark_df.empty:
             self.kinopark_df['Year'] = pd.to_datetime(self.kinopark_df['release_date']).dt.year.astype(str)
             self.kinopark_df['name_en'] = self.kinopark_df['name'].apply(lambda x: self.cached_translate_text(x))
@@ -104,12 +104,12 @@ class MovieRecommender:
             print("Kinopark DataFrame is empty.")
 
     def merge_datasets(self):
-        # Объединение IMDb и Kinopark данных
+        print("Объединение IMDb и Kinopark данных")
         necessary_columns = [
             'Movie', 'Year', 'content', 'source', 'id', 'name', 'trailer',
             'imageVertical', 'imageHorizontal', 'similarity'
         ]
-        # Приведение столбцов к общему виду
+        print("Приведение столбцов к общему виду")
         for col in necessary_columns:
             if col not in self.df.columns:
                 self.df[col] = None
@@ -118,22 +118,22 @@ class MovieRecommender:
         self.merged_df = pd.concat([self.df, self.kinopark_df], ignore_index=True, sort=False)
 
     def prepare_tfidf(self):
-        # Обучение TF-IDF модели на объединённых данных
+        print("Обучение TF-IDF модели на объединённых данных")
         self.tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_features=5000)
         self.tfidf_matrix = self.tfidf_vectorizer.fit_transform(self.merged_df['content'].fillna(''))
 
     def prepare_kinopark_tfidf(self):
-        # Преобразование контента Kinopark с помощью TF-IDF
+        print("Преобразование контента Kinopark с помощью TF-IDF")
         if not self.kinopark_df.empty:
             self.kinopark_tfidf = self.tfidf_vectorizer.transform(self.kinopark_df['content'].fillna(''))
         else:
             self.kinopark_tfidf = None
 
     def create_user_profile(self, user_history):
-        # Нормализация названий фильмов из истории пользователя
+        print("Нормализация названий фильмов из истории пользователя")
         self.user_history_normalized = [self.cached_translate_text(title) for title in user_history]
-        print("Нормализованные названия из истории пользователя:", self.user_history_normalized)
-        print("Доступные фильмы:", self.merged_df['Movie'].tolist())
+        """print("Нормализованные названия из истории пользователя:", self.user_history_normalized)
+        print("Доступные фильмы:", self.merged_df['Movie'].tolist())"""
         user_indices = self.merged_df[self.merged_df['Movie'].isin(self.user_history_normalized)].index
         if not user_indices.empty:
             user_tfidf = self.tfidf_matrix[user_indices]
@@ -145,12 +145,14 @@ class MovieRecommender:
             return None
 
     def recommended_movies(self, user_profile, top_n=10):
+        print("Рекомендация фильмов пользователю")
         if user_profile is not None and self.kinopark_tfidf is not None:
             similarities = cosine_similarity(user_profile, self.kinopark_tfidf).flatten()
             recommendations = self.kinopark_df.copy()
             recommendations['similarity'] = similarities
             recommendations = recommendations[~recommendations['Movie'].isin(self.user_history_normalized)]
             top_recommendations = recommendations.sort_values(by='similarity', ascending=False).head(top_n)
+            print("Рекомендация фильмов пользователю завершена")
             result_columns = [
                 'id',
                 'name',
