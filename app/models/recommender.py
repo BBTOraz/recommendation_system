@@ -57,12 +57,14 @@ class MovieRecommender:
 
     @lru_cache(maxsize=10000)
     def cached_translate_text(self, text):
+        print("кеширование перевода текста")
         if not isinstance(text, str):
             text = str(text)
         return translate_text(text)
 
     @lru_cache(maxsize=10000)
     def cached_translate_and_map_genres(self, genres_tuple):
+        print("кеширование перевод и маппинг текста")
         return translate_and_map_genres(genres_tuple, self.genre_mapping)
 
     def process_kinopark_data(self):
