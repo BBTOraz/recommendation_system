@@ -124,12 +124,12 @@ class MovieRecommender:
 
     def prepare_tfidf(self):
         logging.info("Обучение TF-IDF модели на объединённых данных")
-        # **Оптимизация TF-IDF векторизатора**
+
         self.tfidf_vectorizer = TfidfVectorizer(
             stop_words='english',
-            max_features=2000,  # Уменьшаем количество признаков
-            max_df=0.8,         # Исключаем слишком частые слова
-            min_df=5            # Исключаем слишком редкие слова
+            max_features=2000,
+            max_df=0.8,
+            min_df=5
         )
         self.tfidf_matrix = self.tfidf_vectorizer.fit_transform(self.merged_df['content'].fillna(''))
 

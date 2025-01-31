@@ -10,7 +10,6 @@ router = APIRouter(
     tags=["recommendations"]
 )
 
-# Инициализируем рекомендательную систему при запуске приложения
 recommender = MovieRecommender()
 
 class RecommendationRequest(BaseModel):
@@ -21,14 +20,11 @@ class RecommendationRequest(BaseModel):
 @router.post("/")
 def get_recommendations(request: RecommendationRequest):
     try:
-        # Получаем данные Kinopark для указанного города
         recommender.get_kinopark_data(request.city_id)
         recommender.process_kinopark_data()
         recommender.merge_datasets()
-        # Обучаем TF-IDF на объединённых данных
         recommender.prepare_tfidf()
         recommender.prepare_kinopark_tfidf()
-        # Создаем профиль пользователя и получаем рекомендации
         user_profile = recommender.create_user_profile(request.user_history)
         recommendations = recommender.recommended_movies(user_profile, top_n=request.top_n)
         if recommendations is not None:
