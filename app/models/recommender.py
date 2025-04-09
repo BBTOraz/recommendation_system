@@ -45,7 +45,7 @@ class MovieRecommender:
 
     def get_kinopark_data(self, city_id):
         logging.info("Получение текущей даты в формате YYYY-MM-DD")
-        current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        current_date = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M")
         url = f"https://afisha.api.kinopark.kz/api/movie/today?city={city_id}&start={current_date}"
         headers = {
             "Authorization": f"Bearer {KINOPARK_API_TOKEN}",
