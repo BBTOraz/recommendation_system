@@ -59,7 +59,6 @@ class MovieRecommender:
             if 'data' in kinopark_data and kinopark_data['data']:
                 self.kinopark_df = pd.json_normalize(kinopark_data['data'])
                 print("response from kinopark api: ", response.status_code)
-                print("reponse: ", response.json())
             else:
                 logging.warning("Нет данных о фильмах для указанного города.")
                 print("response from kinopark api: ", response.status_code)
@@ -69,6 +68,7 @@ class MovieRecommender:
             self.kinopark_df = pd.DataFrame()
 
     def translate_text_no_cache(self, text):
+        print("Перевод текста: ", text)
         if not isinstance(text, str):
             text = str(text)
         return translate_text(text)
@@ -89,7 +89,7 @@ class MovieRecommender:
             self.kinopark_df['imageVertical'] = self.kinopark_df['image.vertical']
             self.kinopark_df['imageHorizontal'] = self.kinopark_df['image.horizontal']
             self.kinopark_df['seanceTimeframes'] = self.kinopark_df['seance.timeframes']
-            self.kinopark_df['genre_en'] = self.kinopark_df['genre_str'].apply(
+            self.kinopark_df['genre_en'] = self.kinopark_df['genre'].apply(
                 lambda x: self.translate_and_map_genres_no_cache(tuple(x)) if isinstance(x, list) else ''
             )
             self.kinopark_df['directors_str'] = self.kinopark_df['directors'].apply(
@@ -113,6 +113,7 @@ class MovieRecommender:
             self.kinopark_df['source'] = 'kinopark'
 
             print("Перевод и обработка закончилась")
+            print("Датасет переведенного кинопарка: ", self.kinopark_df)
         else:
             logging.warning("Kinopark DataFrame is empty.")
 
