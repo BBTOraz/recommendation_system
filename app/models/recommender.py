@@ -58,8 +58,11 @@ class MovieRecommender:
             kinopark_data = response.json()
             if 'data' in kinopark_data and kinopark_data['data']:
                 self.kinopark_df = pd.json_normalize(kinopark_data['data'])
+                print("response from kinopark api: ", response.status_code)
+                print("reponse: ", response.json())
             else:
                 logging.warning("Нет данных о фильмах для указанного города.")
+                print("response from kinopark api: ", response.status_code)
                 self.kinopark_df = pd.DataFrame()
         else:
             logging.error(f"Ошибка при получении данных из Kinopark API для города {city_id}")
@@ -75,6 +78,7 @@ class MovieRecommender:
 
     def process_kinopark_data(self):
         logging.info("Перевод и обработка данных Kinopark")
+        print("Перевод и обработка данных")
         if not self.kinopark_df.empty:
             self.kinopark_df['Year'] = pd.to_datetime(self.kinopark_df['release_date']).dt.year.astype(str)
             self.kinopark_df['name_en'] = self.kinopark_df['name'].apply(lambda x: self.translate_text_no_cache(x))
@@ -85,7 +89,7 @@ class MovieRecommender:
             self.kinopark_df['imageVertical'] = self.kinopark_df['image.vertical']
             self.kinopark_df['imageHorizontal'] = self.kinopark_df['image.horizontal']
             self.kinopark_df['seanceTimeframes'] = self.kinopark_df['seance.timeframes']
-            self.kinopark_df['genre_en'] = self.kinopark_df['genre'].apply(
+            self.kinopark_df['genre_en'] = self.kinopark_df['genre_str'].apply(
                 lambda x: self.translate_and_map_genres_no_cache(tuple(x)) if isinstance(x, list) else ''
             )
             self.kinopark_df['directors_str'] = self.kinopark_df['directors'].apply(
@@ -107,16 +111,20 @@ class MovieRecommender:
                 self.kinopark_df['actors_en']
             )
             self.kinopark_df['source'] = 'kinopark'
+
+            print("Перевод и обработка закончилась")
         else:
             logging.warning("Kinopark DataFrame is empty.")
 
     def merge_datasets(self):
         logging.info("Объединение IMDb и Kinopark данных")
+        print("Объединение IMDb и Kinopark данных")
         necessary_columns = [
             'Movie', 'Year', 'content', 'source', 'id', 'name', 'trailer',
             'imageVertical', 'imageHorizontal', 'similarity'
         ]
         logging.info("Приведение столбцов к общему виду")
+        print("Приведение столбцов к общему виду")
         for col in necessary_columns:
             if col not in self.df.columns:
                 self.df[col] = None
@@ -126,7 +134,7 @@ class MovieRecommender:
 
     def prepare_tfidf(self):
         logging.info("Обучение TF-IDF модели на объединённых данных")
-
+        print("Обучение TF-IDF модели на объединённых данных")
         self.tfidf_vectorizer = TfidfVectorizer(
             stop_words='english',
             max_features=2000,
@@ -137,6 +145,7 @@ class MovieRecommender:
 
     def prepare_kinopark_tfidf(self):
         logging.info("Преобразование контента Kinopark с помощью TF-IDF")
+        print("Преобразование контента Kinopark с помощью TF-IDF")
         if not self.kinopark_df.empty:
             self.kinopark_tfidf = self.tfidf_vectorizer.transform(self.kinopark_df['content'].fillna(''))
         else:
@@ -144,6 +153,7 @@ class MovieRecommender:
 
     def create_user_profile(self, user_history):
         logging.info("Нормализация названий фильмов из истории пользователя")
+        print("Нормализация названий фильмов из истории пользователя")
         self.user_history_normalized = [self.translate_text_no_cache(title) for title in user_history]
         user_indices = self.merged_df[self.merged_df['Movie'].isin(self.user_history_normalized)].index
         if not user_indices.empty:
@@ -157,6 +167,7 @@ class MovieRecommender:
 
     def recommended_movies(self, user_profile, top_n=10):
         logging.info("Рекомендация фильмов пользователю")
+        print("")
         if user_profile is not None and self.kinopark_tfidf is not None:
             similarities = cosine_similarity(user_profile, self.kinopark_tfidf).flatten()
             recommendations = self.kinopark_df.copy()
